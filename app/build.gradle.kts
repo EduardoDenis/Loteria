@@ -41,8 +41,10 @@ android {
 
 dependencies {
 
+
+    implementation("androidx.navigation:navigation-compose:2.9.3")
     implementation(libs.androidx.core.ktx)
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.36.0")
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
