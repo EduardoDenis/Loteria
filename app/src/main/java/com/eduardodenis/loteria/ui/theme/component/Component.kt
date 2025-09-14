@@ -1,4 +1,4 @@
-package com.eduardodenis.loteria.component
+package com.eduardodenis.loteria.ui.theme.component
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -24,10 +24,43 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.eduardodenis.loteria.R
 import com.eduardodenis.loteria.ui.theme.Green
 import com.eduardodenis.loteria.ui.theme.LoteriaTheme
+
+@Composable
+fun LoItemType(
+    name: String,
+    color: Color = Color.Black,
+    bgColor: Color = Color.Transparent,
+    @DrawableRes icon: Int = R.drawable.logo_mega_sena
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier
+            .wrapContentSize()
+            .background(bgColor)
+    ) {
+        Image(
+            painterResource(icon),
+            contentDescription = stringResource(id = R.string.trevo),
+            modifier = Modifier
+                .size(100.dp)
+                .padding(10.dp)
+        )
+
+        Text(
+            text = name,
+            fontWeight = FontWeight.Bold,
+            color = color,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(modifier = Modifier.padding(top = 4.dp))
+
+    }
+}
 
 @Composable
 fun LoNumberTextField(
@@ -57,41 +90,6 @@ fun LoNumberTextField(
 
 }
 
-@Composable
-fun LoItemType(
-    name: String,
-    color: Color = Color.Black,
-    bgColor: Color = Color.Transparent,
-    @DrawableRes image: Int
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier
-            .wrapContentSize()
-            .background(bgColor)
-    ) {
-        Image(
-            painterResource(image),
-            contentDescription = stringResource(id = R.string.trevo),
-            modifier = Modifier
-                .size(100.dp)
-                .padding(10.dp)
-        )
-
-        Text(
-            text = name,
-            fontWeight = FontWeight.Bold,
-            color = color,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-        )
-
-        Spacer(modifier = Modifier.padding(top = 4.dp))
-
-    }
-}
-
-
 @Preview(showBackground = true)
 @Composable
 fun LoItemTypePreview() {
@@ -99,7 +97,7 @@ fun LoItemTypePreview() {
         name = "Mega Sena",
         color = Color.White,
         bgColor = Green,
-        image = R.drawable.logo_mega_sena
+        icon = R.drawable.logo_mega_sena
     )
 }
 
