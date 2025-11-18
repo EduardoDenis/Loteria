@@ -1,5 +1,6 @@
-package com.eduardodenis.loteria.compose.quina
+package com.eduardodenis.loteria.compose.lotofacil
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -44,7 +45,6 @@ import com.eduardodenis.loteria.App
 import com.eduardodenis.loteria.R
 import com.eduardodenis.loteria.data.Bet
 import com.eduardodenis.loteria.ui.theme.LoteriaTheme
-import com.eduardodenis.loteria.ui.theme.Purple40
 import com.eduardodenis.loteria.ui.theme.component.AutoTextDropDown
 import com.eduardodenis.loteria.ui.theme.component.LoItemType
 import com.eduardodenis.loteria.ui.theme.component.LoNumberTextField
@@ -53,8 +53,7 @@ import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuinaScreen(onBackCLick: () -> Unit, onMenuClick: (String) -> Unit) {
-
+fun LotofacilScreen(onBackCLick: () -> Unit, onMenuClick: (String) -> Unit) {
     val snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
 
     Surface(
@@ -75,28 +74,28 @@ fun QuinaScreen(onBackCLick: () -> Unit, onMenuClick: (String) -> Unit) {
                         }
                     },
                     actions = {
-                        IconButton(onClick = { onMenuClick("quina") }) {
+                        IconButton(onClick = { onMenuClick("lotofacil") }) {
                             Icon(imageVector = Icons.Filled.List, contentDescription = "")
                         }
                     }
                 )
             }
         ) { contentPadding ->
-            QuinaContentScreen(
+            LotofacilContentScreen(
                 modifier = Modifier.padding(top = contentPadding.calculateTopPadding()),
                 snackbarHostState = snackbarHostState,
                 onClick = {})
         }
     }
-
 }
 
 @Composable
-fun QuinaContentScreen(
+fun LotofacilContentScreen(
     modifier: Modifier,
     snackbarHostState: SnackbarHostState,
     onClick: (String) -> Unit
 ) {
+
     val isInPreview = LocalInspectionMode.current
 
     // O acesso ao DB só acontece se NÃO estiver no Preview
@@ -124,6 +123,7 @@ fun QuinaContentScreen(
 
     val resultsToSave = remember { mutableListOf<String>() }
 
+
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -132,13 +132,12 @@ fun QuinaContentScreen(
             .verticalScroll(scrollState)
     ) {
         LoItemType(
-            name = "Quina",
-            color = Purple40,
-            icon = R.drawable.logo_quina
+            name = "Lotofacil",
+            icon = R.drawable.logo_lotofacil
         )
 
         Text(
-            text = stringResource(id = R.string.announcement_quina),
+            text = stringResource(id = R.string.announcement_lotofacil),
             fontStyle = FontStyle.Italic,
             modifier = Modifier
                 .padding(start = 15.dp)
@@ -155,7 +154,7 @@ fun QuinaContentScreen(
 
         LoNumberTextField(
             value = qtdNumbers,
-            label = R.string.quina_rule,
+            label = R.string.lotofacil_rule,
             placeholder = R.string.quantity
         ) {
             if (it.length < 3) {
@@ -194,12 +193,13 @@ fun QuinaContentScreen(
                     scope.launch {
                         snackbarHostState.showSnackbar(errorBets)
                     }
-                } else if (numbers < 5 || numbers > 15) {
+                } else if (numbers < 15 || numbers > 18) {
                     scope.launch {
                         snackbarHostState.showSnackbar(errorNumbers)
                     }
                 } else {
                     result = ""
+                    resultsToSave.clear()
 
                     val rule = rules.indexOf(selectedItem)
                     for (i in 1..bets) {
@@ -220,13 +220,14 @@ fun QuinaContentScreen(
         Text(text = result)
 
     }
+
     if (showAlertDialog) {
         AlertDialog(
             onDismissRequest = {},
             confirmButton = {
                 TextButton(onClick = {
                     showAlertDialog = false
-                    onClick("quina")
+                    onClick("lotofacil")
                 }) {
                     Text(text = stringResource(id = android.R.string.ok))
                 }
@@ -234,7 +235,7 @@ fun QuinaContentScreen(
                 TextButton(onClick = {
                     Thread {
                         for (res in resultsToSave) {
-                            val bet = Bet(type = "quina", numbers = res)
+                            val bet = Bet(type = "lotofacil", numbers = res)
                             db?.betDao()?.insert(bet)
                         }
                     }.start()
@@ -253,11 +254,12 @@ fun QuinaContentScreen(
     }
 }
 
+
 private fun numberGenerator(qtd: Int, rule: Int): String {
     val numbers = mutableSetOf<Int>()
 
     while (true) {
-        val n = Random.nextInt(80)
+        val n = Random.nextInt(25)
 
         if (rule == 1) {
             if (n % 2 == 0) {
@@ -285,14 +287,10 @@ private fun validadeInput(input: String): String {
     return filteredChars
 }
 
-
 @Preview(showBackground = true)
 @Composable
-fun QuinaScreenPreview() {
+fun LotofacilScreenPreview() {
     LoteriaTheme(darkTheme = false) {
-        QuinaScreen(
-            onBackCLick = {},
-            onMenuClick = {}
-        )
+        LotofacilScreen(onBackCLick = {}, onMenuClick = {})
     }
 }

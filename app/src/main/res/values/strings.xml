@@ -1,9 +1,14 @@
 <resources>
     <string name="app_name">Loteria</string>
     <string name="trevo">Trevo de 4 folhas</string>
-    <string name="announcement">Escolha de 6 a 15 números para o APP gerar 60 números. Ganhe com 6,
-        5 ou 4 acertos.\nSão realizados dois sorteios semanais para você apostar e torcer para ficar milionário.</string>
+    <string name="announcement_mega_sena">Escolha de 6 a 15 números para o APP gerar 60 números. Ganhe com 6,
+        5 ou 4 acertos.\nSão realizados três sorteios semanais às 21h.</string>
+    <string name="announcement_quina">Escolha de 5 a 15 números para o APP gerar 80 números. Ganhe com 6,
+        5 ou 4 acertos.\nSão realizados sorteios semanais de segunda a sábado às 21h .</string>
+    <string name="announcement_lotofacil">Escolha de 15 a 18 números para o APP gerar 25 números. Ganhe com 11,
+        12, 13, 14 ou 15 acertos.\nSão realizados sorteios semanais de segunda a sábado às 21h.</string>
     <string name="mega_rule">De 6 a 15 números</string>
+    <string name="lotofacil_rule">De 15 a 18 números</string>
     <string name="quantity">Quantos números vai apostar?</string>
     <string name="bets">Quantidade de apostas</string>
     <string name="bets_quantity">Quantas apostas irá tentar?</string>
@@ -11,4 +16,8 @@
     <string name="error_bets">Máximo número de apostas permitido: 10</string>
     <string name="error_numbers">Números devem ser de 6 a 15</string>
     <string name="good_luck">Boa Sorte :)</string>
+    <string name="save">Salvar</string>
+    <string name="list_response"> [%1$d] %2$s \n%3$s </string>
+    <string name="bet_rule">Regra de Aposta</string>
+    <string name="quina_rule">De 5 a 15 números</string>
 </resources>
