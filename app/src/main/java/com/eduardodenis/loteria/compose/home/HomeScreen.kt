@@ -1,5 +1,6 @@
 package com.eduardodenis.loteria.compose.home
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,11 +49,12 @@ fun HomeScreen(onClick: (MainItem) -> Unit) {
         ) {
             LazyVerticalGrid(
                 verticalArrangement = Arrangement.spacedBy(30.dp),
-                columns = GridCells.Fixed(2)
+                columns = GridCells.Fixed(3)
             ) {
                 items(mainItems) {
                     LotteryItem(it) {
                         onClick(it)
+                        Log.i("Clicou", "passou o id $it")
                     }
                 }
             }
@@ -68,6 +70,7 @@ fun LotteryItem(item: MainItem, onClick: () -> Unit) {
             .wrapContentSize()
             .clickable {
                 onClick()
+                Log.i("Clicou", "clicou no item")
             }
     ) {
         Column(

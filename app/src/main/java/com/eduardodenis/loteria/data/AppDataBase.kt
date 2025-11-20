@@ -21,7 +21,6 @@ abstract class AppDataBase : RoomDatabase() {
             return instance ?: synchronized(this) {
                 buildDatabase(context).also {
                     instance = it
-                    Log.i("create", "Banco criado")
                 }
             }
         }
