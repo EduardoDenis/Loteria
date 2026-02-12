@@ -40,7 +40,7 @@ android {
         compose = true
     }
 
-    room{
+    room {
         schemaDirectory("$projectDir/schemas")
     }
 
@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation("androidx.compose.runtime:runtime-livedata")
     implementation(libs.androidx.material.icons.core)
 
     implementation(libs.androidx.room.runtime)

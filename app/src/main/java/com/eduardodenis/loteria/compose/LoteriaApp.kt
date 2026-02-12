@@ -79,8 +79,7 @@ fun LoteriaAppNavHost(navController: NavHostController) {
                     type = NavType.StringType
                 }
             )) {
-            val type = it.arguments?.getString("type") ?: throw Exception("Tipo nao encontrado")
-            BetListDetailScreen(type = type)
+            BetListDetailScreen()
 
         }
     }

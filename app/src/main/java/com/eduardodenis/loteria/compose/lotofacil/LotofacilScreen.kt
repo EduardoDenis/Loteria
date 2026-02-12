@@ -233,12 +233,12 @@ fun LotofacilContentScreen(
                 }
             }, dismissButton = {
                 TextButton(onClick = {
-                    Thread {
-                        for (res in resultsToSave) {
-                            val bet = Bet(type = "lotofacil", numbers = res)
-                            db?.betDao()?.insert(bet)
-                        }
-                    }.start()
+//                    Thread {
+//                        for (res in resultsToSave) {
+//                            val bet = Bet(type = "lotofacil", numbers = res)
+//                            db?.betDao()?.insert(bet)
+//                        }
+//                    }.start()
                     showAlertDialog = false
                 }) {
                     Text(text = stringResource(id = R.string.save))

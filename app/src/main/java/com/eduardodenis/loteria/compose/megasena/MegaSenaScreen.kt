@@ -28,6 +28,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.eduardodenis.loteria.App
 import com.eduardodenis.loteria.R
 import com.eduardodenis.loteria.data.Bet
@@ -50,12 +52,18 @@ import com.eduardodenis.loteria.ui.theme.LoteriaTheme
 import com.eduardodenis.loteria.ui.theme.component.AutoTextDropDown
 import com.eduardodenis.loteria.ui.theme.component.LoItemType
 import com.eduardodenis.loteria.ui.theme.component.LoNumberTextField
+import com.eduardodenis.loteria.viewmodels.BetViewModel
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 @Composable
-fun MegaScreen(onBackCLick: () -> Unit, onMenuClick: (String) -> Unit) {
+fun MegaScreen(
+    onBackCLick: () -> Unit,
+    onMenuClick: (String) -> Unit,
+    betViewModel: BetViewModel = viewModel(factory = BetViewModel.Factory)
+) {
     val snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
+    val scope = rememberCoroutineScope()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -84,8 +92,12 @@ fun MegaScreen(onBackCLick: () -> Unit, onMenuClick: (String) -> Unit) {
         ) { contentPadding ->
             MegaSenaContentScreen(
                 modifier = Modifier.padding(top = contentPadding.calculateTopPadding()),
-                snackbarHostState = snackbarHostState,
-                onClick = {})
+                betViewModel = betViewModel
+            ) { message ->
+                scope.launch {
+                    snackbarHostState.showSnackbar(message)
+                }
+            }
         }
     }
 }
@@ -93,36 +105,33 @@ fun MegaScreen(onBackCLick: () -> Unit, onMenuClick: (String) -> Unit) {
 @Composable
 fun MegaSenaContentScreen(
     modifier: Modifier,
-    snackbarHostState: SnackbarHostState,
-    onClick: (String) -> Unit
+    betViewModel: BetViewModel,
+    formError: (String) -> Unit
 ) {
 
-    val isInPreview = LocalInspectionMode.current
-
-    // O acesso ao DB só acontece se NÃO estiver no Preview
-    val db = if (isInPreview) {
-        null // Retorna nulo no Preview
-    } else {
-        (LocalContext.current.applicationContext as App).db
-    }
+//    val isInPreview = LocalInspectionMode.current
+//    // O acesso ao DB só acontece se NÃO estiver no Preview
+//    val db = if (isInPreview) {
+//        null // Retorna nulo no Preview
+//    } else {
+//        (LocalContext.current.applicationContext as App).db
+//    }
 
     val errorBets = stringResource(id = R.string.error_bets)
     val errorNumbers = stringResource(id = R.string.error_numbers)
 
-    var qtdNumbers by remember { mutableStateOf("") }
-    var qtdBets by remember { mutableStateOf("") }
-    var result by remember { mutableStateOf("") }
-    var showAlertDialog by remember { mutableStateOf(false) }
+    val result = betViewModel.result.observeAsState("").value
+    val showAlertDialog = betViewModel.showAlert.observeAsState(false).value
 
-//    val snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
-    val scope = rememberCoroutineScope()
+
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
 
     val rules = stringArrayResource(id = R.array.array_bet_rules)
     var selectedItem by remember { mutableStateOf(rules.first()) }
 
-    val resultsToSave = remember { mutableListOf<String>() }
+    val qtdNumbers = betViewModel.qtdNumbers
+    val qtdBets = betViewModel.qtdBets
 
 
     Column(
@@ -158,9 +167,8 @@ fun MegaSenaContentScreen(
             label = R.string.mega_rule,
             placeholder = R.string.quantity
         ) {
-            if (it.length < 3) {
-                qtdNumbers = validadeInput(it)
-            }
+            betViewModel.updateQtdNumbers(it)
+
         }
 
         LoNumberTextField(
@@ -169,9 +177,7 @@ fun MegaSenaContentScreen(
             placeholder = R.string.bets_quantity,
             imeAction = ImeAction.Done
         ) {
-            if (it.length < 3) {
-                qtdBets = validadeInput(it)
-            }
+            betViewModel.updateQtdBets(it)
         }
 
         Column(modifier = Modifier.width(280.dp)) {
@@ -191,26 +197,13 @@ fun MegaSenaContentScreen(
                 val bets = qtdBets.toInt()
                 val numbers = qtdNumbers.toInt()
                 if (bets < 1 || bets > 10) {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(errorBets)
-                    }
+                    formError(errorBets)
                 } else if (numbers < 6 || numbers > 15) {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(errorNumbers)
-                    }
-                } else {
-                    result = ""
-                    resultsToSave.clear()
+                    formError(errorNumbers)
 
+                } else {
                     val rule = rules.indexOf(selectedItem)
-                    for (i in 1..bets) {
-                        val res = numberGenerator(numbers, rule)
-                        resultsToSave.add(res)
-                        result += "[$i]  "
-                        result += res
-                        result += "\n\n"
-                    }
-                    showAlertDialog = true
+                    betViewModel.updateNumbers(rule)
                 }
                 keyboardController?.hide()
             }
@@ -227,20 +220,19 @@ fun MegaSenaContentScreen(
             onDismissRequest = {},
             confirmButton = {
                 TextButton(onClick = {
-                    showAlertDialog = false
-                    onClick("megasena")
+                    betViewModel.dismissAlert()
                 }) {
                     Text(text = stringResource(id = android.R.string.ok))
                 }
             }, dismissButton = {
                 TextButton(onClick = {
-                    Thread {
-                        for (res in resultsToSave) {
-                            val bet = Bet(type = "megasena", numbers = res)
-                            db?.betDao()?.insert(bet)
-                        }
-                    }.start()
-                    showAlertDialog = false
+//                    Thread {
+//                        for (res in resultsToSave) {
+//                            val bet = Bet(type = "megasena", numbers = res)
+//                            db?.betDao()?.insert(bet)
+//                        }
+//                    }.start()
+                    betViewModel.saveBet("megasena")
                 }) {
                     Text(text = stringResource(id = R.string.save))
                 }
@@ -253,39 +245,6 @@ fun MegaSenaContentScreen(
             }
         )
     }
-}
-
-
-private fun numberGenerator(qtd: Int, rule: Int): String {
-    val numbers = mutableSetOf<Int>()
-
-    while (true) {
-        val n = Random.nextInt(60)
-
-        if (rule == 1) {
-            if (n % 2 == 0) {
-                continue
-            }
-        } else if (rule == 2) {
-            if (n % 2 != 0) {
-                continue
-            }
-        }
-        numbers.add(n + 1)
-        if (numbers.size == qtd) {
-            break
-        }
-    }
-
-    return numbers.joinToString(" - ")
-}
-
-private fun validadeInput(input: String): String {
-    val filteredChars = input.filter { chars ->
-        chars.isDigit()
-    }
-
-    return filteredChars
 }
 
 @Preview(showBackground = true)
