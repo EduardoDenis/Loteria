@@ -23,8 +23,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eduardodenis.loteria.R
 import com.eduardodenis.loteria.model.MainItem
+import com.eduardodenis.loteria.ui.theme.Black
 import com.eduardodenis.loteria.ui.theme.BlueColor
 import com.eduardodenis.loteria.ui.theme.DarkGreen
+import com.eduardodenis.loteria.ui.theme.Gray
 import com.eduardodenis.loteria.ui.theme.Green
 import com.eduardodenis.loteria.ui.theme.LoteriaTheme
 import com.eduardodenis.loteria.ui.theme.Purple40
@@ -34,12 +36,12 @@ import com.eduardodenis.loteria.ui.theme.component.LoItemType
 fun HomeScreen(onClick: (MainItem) -> Unit) {
 
     val mainItems = mutableListOf(
-        MainItem(1, "Mega Sena", Green, R.drawable.logo_mega_sena),
-        MainItem(2, "Quina", BlueColor, R.drawable.logo_quina),
-        MainItem(3, "LotoFácil", Purple40, R.drawable.logo_lotofacil)
+        MainItem(1, "Mega Sena", Black, R.drawable.logo_mega_sena),
+        MainItem(2, "Quina", Black, R.drawable.logo_quina),
+        MainItem(3, "LotoFácil", Black, R.drawable.logo_lotofacil)
     )
     Scaffold(
-        modifier = Modifier.fillMaxSize(), containerColor = DarkGreen
+        modifier = Modifier.fillMaxSize(), containerColor = Gray
     ) { innerPadding ->
         Box(
             modifier = Modifier

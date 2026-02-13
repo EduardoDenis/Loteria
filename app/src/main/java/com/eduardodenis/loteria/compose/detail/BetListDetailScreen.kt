@@ -46,7 +46,7 @@ fun BetListDetailScreen(
         Scaffold(modifier = Modifier.fillMaxSize()) { contentPadding ->
             LazyColumn(
                 modifier = Modifier.padding(contentPadding),
-                verticalArrangement = Arrangement.spacedBy(10git .dp)
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 itemsIndexed(bets) { index, bet ->
                     Text(

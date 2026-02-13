@@ -63,26 +63,52 @@ class BetViewModel(
 
     }
 
+    fun deleteHistoricBet(type: String) {
+        viewModelScope.launch {
+            betRepository.deleteHistoric(type)
+        }
+    }
+
     fun updateQtdBets(newBets: String) {
         if (newBets.length < 3) {
             qtdBets = validadeInput(newBets)
         }
     }
 
-    fun updateNumbers(rule: Int) {
+    // Supondo que você tenha o tipo de jogo guardado ou passado por parâmetro
+    fun updateNumbers(rule: Int, type: LotteryType) {
         _result.value = ""
         numbers.clear()
 
-        for (i in 1..qtdBets.toInt()) {
-            val res = numberGenerator(qtdNumbers.toInt(), rule)
-            numbers.add(res)
-            _result.value += "[$i]  "
-            _result.value += res
-            _result.value += "\n\n"
-        }
-        _showAlert.value = true
+        // Usamos um StringBuilder para construir o texto de uma vez só (Melhor performance)
+        val stringBuilder = StringBuilder()
 
+        for (i in 1..qtdBets.toInt()) {
+            // Agora passando o 'type' que o generator exige
+            val res = numberGenerator(type, qtdNumbers.toInt(), rule)
+
+            numbers.add(res)
+            stringBuilder.append("[$i]  $res\n\n")
+        }
+
+        _result.value = stringBuilder.toString()
+        _showAlert.value = true
     }
+
+
+//    fun updateNumbers(rule: Int) {
+//        _result.value = ""
+//        numbers.clear()
+//
+//        for (i in 1..qtdBets.toInt()) {
+//            val res = numberGenerator(qtdNumbers.toInt(), rule)
+//            numbers.add(res)
+//            _result.value += "[$i]  "
+//            _result.value += res
+//            _result.value += "\n\n"
+//        }
+//        _showAlert.value = true
+//    }
 
     fun dismissAlert() {
         _showAlert.value = false
@@ -97,29 +123,62 @@ class BetViewModel(
         return filteredChars
     }
 
-    private fun numberGenerator(qtd: Int, rule: Int): String {
-        val numbers = mutableSetOf<Int>()
+    enum class LotteryType(val maxNumber: Int, val rangedAllowed: IntRange) {
+        MEGA_SENA(60, 6..20),
+        QUINA(80, 5..15),
+        LOTOFACIL(25, 15..20)
+    }
 
-        while (true) {
-            val n = Random.nextInt(60)
-
-            if (rule == 1) {
-                if (n % 2 == 0) {
-                    continue
-                }
-            } else if (rule == 2) {
-                if (n % 2 != 0) {
-                    continue
-                }
-            }
-            numbers.add(n + 1)
-            if (numbers.size == qtd) {
-                break
-            }
+    private fun numberGenerator(type: LotteryType, qtd: Int, rule: Int): String {
+        val validateQtd = when {
+            qtd < type.rangedAllowed.first -> type.rangedAllowed.first
+            qtd > type.rangedAllowed.last -> type.rangedAllowed.last
+            else -> qtd
         }
 
-        return numbers.joinToString(" - ")
+        val numbers = mutableSetOf<Int>()
+
+        while (numbers.size < validateQtd) {
+            val n = Random.nextInt(type.maxNumber) + 1
+
+            val isEven = n % 2 == 0
+            val shouldSkip = when (rule) {
+                1 -> !isEven
+                2 -> isEven
+                else -> false
+            }
+
+            if (!shouldSkip) {
+                numbers.add(n)
+            }
+        }
+        return numbers.sorted().joinToString(" - ")
     }
+
+//    private fun numberGenerator(qtd: Int, rule: Int): String {
+//        val numbers = mutableSetOf<Int>()
+//
+//        while (true) {
+//            val n = Random.nextInt(60)
+//
+//            if (rule == 1) {
+//                if (n % 2 == 0) {
+//                    continue
+//                }
+//            } else if (rule == 2) {
+//                if (n % 2 != 0) {
+//                    continue
+//                }
+//            }
+//            numbers.add(n + 1)
+//            if (numbers.size == qtd) {
+//                break
+//            }
+//        }
+//
+//        return numbers.joinToString(" - ")
+//    }
+
 
     @Suppress("UNCHECKED_CAST")
     companion object {

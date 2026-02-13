@@ -10,6 +10,11 @@ class BetRepository(private val betDao: BetDao) {
         betDao.insert(bet)
     }
 
+    suspend fun deleteHistoric(betType: String) {
+        betDao.deleteHistoric(betType)
+    }
+
+
     companion object {
         private var instance: BetRepository? = null
 

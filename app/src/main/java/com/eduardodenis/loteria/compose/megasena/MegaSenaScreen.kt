@@ -5,6 +5,7 @@ package com.eduardodenis.loteria.compose.megasena
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -109,20 +110,19 @@ fun MegaSenaContentScreen(
     formError: (String) -> Unit
 ) {
 
-//    val isInPreview = LocalInspectionMode.current
-//    // O acesso ao DB só acontece se NÃO estiver no Preview
-//    val db = if (isInPreview) {
-//        null // Retorna nulo no Preview
-//    } else {
-//        (LocalContext.current.applicationContext as App).db
-//    }
+    val isInPreview = LocalInspectionMode.current
+    // O acesso ao DB só acontece se NÃO estiver no Preview
+    val db = if (isInPreview) {
+        null // Retorna nulo no Preview
+    } else {
+        (LocalContext.current.applicationContext as App).db
+    }
 
     val errorBets = stringResource(id = R.string.error_bets)
-    val errorNumbers = stringResource(id = R.string.error_numbers)
+    val errorNumbers = stringResource(id = R.string.error_numbers_mega)
 
     val result = betViewModel.result.observeAsState("").value
     val showAlertDialog = betViewModel.showAlert.observeAsState(false).value
-
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
@@ -133,12 +133,14 @@ fun MegaSenaContentScreen(
     val qtdNumbers = betViewModel.qtdNumbers
     val qtdBets = betViewModel.qtdBets
 
+    val lotteryType = BetViewModel.LotteryType.MEGA_SENA
+
+
 
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-//                .padding(innerPadding)
             .verticalScroll(scrollState)
     ) {
         LoItemType(
@@ -191,29 +193,37 @@ fun MegaSenaContentScreen(
             )
         }
 
-        OutlinedButton(
-            enabled = qtdNumbers.isNotEmpty() && qtdBets.isNotEmpty(),
-            onClick = {
-                val bets = qtdBets.toInt()
-                val numbers = qtdNumbers.toInt()
-                if (bets < 1 || bets > 10) {
-                    formError(errorBets)
-                } else if (numbers < 6 || numbers > 15) {
-                    formError(errorNumbers)
-
-                } else {
-                    val rule = rules.indexOf(selectedItem)
-                    betViewModel.updateNumbers(rule)
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            OutlinedButton(
+                enabled = qtdNumbers.isNotEmpty() && qtdBets.isNotEmpty(),
+                onClick = {
+                    val bets = qtdBets.toInt()
+                    val numbers = qtdNumbers.toInt()
+                    if (bets < 1 || bets > 10) {
+                        formError(errorBets)
+                    } else if (numbers < 6 || numbers > 15) {
+                        formError(errorNumbers)
+                    } else {
+                        val rule = rules.indexOf(selectedItem)
+                        betViewModel.updateNumbers(rule, lotteryType)
+                    }
+                    keyboardController?.hide()
                 }
-                keyboardController?.hide()
+            ) {
+                Text(stringResource(id = R.string.bets_generate))
             }
-        ) {
-            Text(stringResource(id = R.string.bets_generate))
+            
+            OutlinedButton(onClick = {
+                betViewModel.deleteHistoricBet("megasena")
+            }) {
+                Text(text = "Limpar Histórico")
+            }
         }
 
-        Text(text = result)
 
+        Text(text = result)
     }
+
 
     if (showAlertDialog) {
         AlertDialog(

@@ -14,7 +14,9 @@
     <string name="bets_quantity">Quantas apostas irá tentar?</string>
     <string name="bets_generate">Gerar apostas</string>
     <string name="error_bets">Máximo número de apostas permitido: 10</string>
-    <string name="error_numbers">Números devem ser de 6 a 15</string>
+    <string name="error_numbers_mega">Números devem ser de 6 a 15</string>
+    <string name="error_numbers_quina">Números devem ser de 5 a 15</string>
+    <string name="error_numbers_lotofacil">Números devem ser de 15 a 20</string>
     <string name="good_luck">Boa Sorte :)</string>
     <string name="save">Salvar</string>
     <string name="list_response"> [%1$d] %2$s \n%3$s </string>

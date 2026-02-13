@@ -13,4 +13,11 @@ interface BetDao {
 
     @Query("SELECT * FROM bets WHERE type = :betType")
     suspend fun getNumberByType(betType: String): List<Bet>
+
+    @Query("DELETE FROM bets WHERE type = :betType")
+    suspend fun deleteHistoric(betType: String)
+
+
 }
+
+
